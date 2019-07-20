@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "863586150292",
+    "firebase_url": "https://smartbook-496f7.firebaseio.com",
+    "project_id": "smartbook-496f7",
+    "storage_bucket": "smartbook-496f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863586150292:android:8ea2cd0e41c09db3",
+        "android_client_info": {
+          "package_name": "com.guess.hk.smartbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863586150292-lksp1k55n7rc8f39r903t2d1021baj8d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfz7WScJdq8kszFZAvO-KFvSDoo-GhoPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863586150292-lksp1k55n7rc8f39r903t2d1021baj8d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
