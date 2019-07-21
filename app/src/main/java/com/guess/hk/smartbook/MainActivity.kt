@@ -32,6 +32,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
         val booksDataManager = BooksDataManager()
         textureView = texture_view
+        textureView.isOpaque = false
         cameraManage = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK
         textureListener = object : TextureListener {
@@ -76,11 +77,15 @@ class MainActivity : FragmentActivity() {
 
     override fun onStop() {
         super.onStop()
-        camera.closeCamera()
+        if(::camera.isInitialized){
+            camera.closeCamera()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        camera.closeCamera()
+        if(::camera.isInitialized){
+            camera.closeCamera()
+        }
     }
 }

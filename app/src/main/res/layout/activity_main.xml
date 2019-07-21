@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent" android:layout_height="match_parent"
         tools:context=".MainActivity">
 
     <TextureView
@@ -15,12 +15,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"/>
 
-    <View android:layout_width="300dp"
-          android:layout_height="300dp"
-          app:layout_constraintLeft_toLeftOf="@id/texture_view"
-          app:layout_constraintRight_toRightOf="@id/texture_view"
-          app:layout_constraintTop_toTopOf="@id/texture_view"
-          app:layout_constraintBottom_toBottomOf="@id/texture_view"
-          android:background="@drawable/rect"/>
+
+    <com.guess.hk.smartbook.DrawView android:layout_width="wrap_content"
+                                     android:layout_height="wrap_content"
+                                     app:layout_constraintLeft_toLeftOf="@id/texture_view"
+                                     app:layout_constraintRight_toRightOf="@id/texture_view"
+                                     app:layout_constraintTop_toTopOf="@id/texture_view"
+                                     app:layout_constraintBottom_toBottomOf="@id/texture_view"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

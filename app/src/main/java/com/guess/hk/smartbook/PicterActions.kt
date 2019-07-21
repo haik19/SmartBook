@@ -2,9 +2,12 @@ package com.guess.hk.smartbook
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import java.io.File
 import java.io.FileOutputStream
 
@@ -25,4 +28,23 @@ private fun saveImage(finalBitmap: Bitmap, image_name: String) {
         Uri.parse(url)
     )
     context.startActivity(intent)
+}
+
+fun getScreenWidthInPx(context: Context): Int {
+    val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+    val metrics = DisplayMetrics()
+    display.getMetrics(metrics)
+    return metrics.widthPixels
+}
+
+fun getScreenHeigthInPx(context: Context): Int {
+    val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+    val metrics = DisplayMetrics()
+    display.getMetrics(metrics)
+    return metrics.heightPixels
+}
+
+fun convertDpToPixel(dp: Float): Int {
+    val metrics = Resources.getSystem().displayMetrics
+    return (dp * metrics.density).toInt()
 }
