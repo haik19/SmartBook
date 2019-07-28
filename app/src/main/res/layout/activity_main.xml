@@ -21,6 +21,7 @@
                                      app:layout_constraintLeft_toLeftOf="@id/texture_view"
                                      app:layout_constraintRight_toRightOf="@id/texture_view"
                                      app:layout_constraintTop_toTopOf="@id/texture_view"
+                                     android:background="@color/transparent_black"
                                      app:layout_constraintBottom_toBottomOf="@id/texture_view"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

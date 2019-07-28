@@ -3,10 +3,9 @@ package com.guess.hk.smartbook;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.graphics.PointF;
 
-public class ColorBall {
+public class Corner {
 
 	Bitmap bitmap;
 	Context mContext;
@@ -14,7 +13,7 @@ public class ColorBall {
 	int id;
 	static int count = 0;
 
-	public ColorBall(Context context, int resourceId, PointF point) {
+	public Corner(Context context, int resourceId, PointF point) {
 		this.id = count++;
 		bitmap = BitmapFactory.decodeResource(context.getResources(),
 				resourceId);
