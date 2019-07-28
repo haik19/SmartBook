@@ -4,21 +4,42 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.PointF;
 
 public class ColorBall {
 
 	Bitmap bitmap;
 	Context mContext;
-	Point point;
+	PointF point;
 	int id;
 	static int count = 0;
 
-	public ColorBall(Context context, int resourceId, Point point) {
+	public ColorBall(Context context, int resourceId, PointF point) {
 		this.id = count++;
 		bitmap = BitmapFactory.decodeResource(context.getResources(),
 				resourceId);
 		mContext = context;
 		this.point = point;
+	}
+
+	public float getX() {
+		return point.x;
+	}
+
+	public float getY() {
+		return point.y;
+	}
+
+	public int getID() {
+		return id;
+	}
+
+	public void setX(float x) {
+		point.x = x;
+	}
+
+	public void setY(float y) {
+		point.y = y;
 	}
 
 	public int getWidthOfBall() {
@@ -31,25 +52,5 @@ public class ColorBall {
 
 	public Bitmap getBitmap() {
 		return bitmap;
-	}
-
-	public int getX() {
-		return point.x;
-	}
-
-	public int getY() {
-		return point.y;
-	}
-
-	public int getID() {
-		return id;
-	}
-
-	public void setX(int x) {
-		point.x = x;
-	}
-
-	public void setY(int y) {
-		point.y = y;
 	}
 }
