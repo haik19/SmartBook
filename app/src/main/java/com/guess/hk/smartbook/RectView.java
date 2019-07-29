@@ -1,7 +1,6 @@
 package com.guess.hk.smartbook;
 
 import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
@@ -10,7 +9,7 @@ import android.view.View;
 
 public class RectView extends View {
 
-	private int touchAreaSize = 30;
+	private int touchAreaSize = 50;
 
 	private int balID;
 	private float startX = -1;
@@ -19,6 +18,7 @@ public class RectView extends View {
 	private Paint roundsPaint;
 	private PointF[] points = new PointF[4];
 	private ArrayList<Corner> corners = new ArrayList<>();
+	private Paint linePaint;
 
 	public RectView(Context context) {
 		this(context, null);
@@ -28,6 +28,8 @@ public class RectView extends View {
 		super(context, attrs, defStyle);
 		rectanglePaint = new Paint();
 		roundsPaint = new Paint();
+		linePaint = new Paint();
+		linePaint.setColor(Color.GREEN);
 		rectanglePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 		rectanglePaint.setAntiAlias(true);
 		setWillNotDraw(false);
@@ -71,6 +73,9 @@ public class RectView extends View {
 		canvas.drawBitmap(corners.get(1).getBitmap(), corners.get(1).getX(), corners.get(1).getY(), roundsPaint);
 		canvas.drawBitmap(corners.get(2).getBitmap(), corners.get(2).getX() - corners.get(2).getWidthOfBall(), corners.get(2).getY(), roundsPaint);
 		canvas.drawBitmap(corners.get(3).getBitmap(), corners.get(3).getX() - corners.get(3).getWidthOfBall(), corners.get(3).getY() - corners.get(3).getHeightOfBall(), roundsPaint);
+
+		//draw line
+		canvas.drawLine(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, linePaint);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {

@@ -2,6 +2,7 @@ package com.guess.hk.smartbook
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.os.Handler
@@ -11,6 +12,8 @@ import android.view.Surface
 import android.view.TextureView
 import androidx.core.app.ActivityCompat
 import java.util.*
+import android.hardware.camera2.CameraCharacteristics
+
 
 
 class Camera(private val manager: CameraManager, cameraFacing: Int, private val textureView: TextureView) {
@@ -21,7 +24,7 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
     private var backgroundThread: HandlerThread? = null
     private var cameraSession: CameraCaptureSession? = null
     private var captureRequestBuilder : CaptureRequest.Builder? = null
-    private var builder: CaptureRequest.Builder? = null
+    private var rect: Rect? = null
 
     private val stateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
@@ -49,6 +52,7 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
                     previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture::class.java)[0]
                 }
                 this.cameraId = cameraId
+                rect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
             }
         }
     }
@@ -111,6 +115,15 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
     }
 
     fun unLock() {
+        cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
+    }
+
+
+    fun zoom(context: Context, zoomLevel : Int){
+        val zoom = Rect(rect!!.left+zoomLevel, rect!!.top+zoomLevel,
+            rect!!.right - zoomLevel, rect!!.bottom-zoomLevel
+        )
+        captureRequestBuilder?.set(CaptureRequest.SCALER_CROP_REGION, zoom)
         cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
     }
 

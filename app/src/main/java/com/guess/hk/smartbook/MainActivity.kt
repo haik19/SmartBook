@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.TextureView
 import android.view.Window
 import android.view.WindowManager
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.ml.vision.FirebaseVision
@@ -62,6 +63,19 @@ class MainActivity : FragmentActivity() {
                 camera.unLock()
             }
         }
+
+        zoom_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                camera.zoom(this@MainActivity, progress*20)
+            }
+        })
+
     }
 
     override fun onResume() {
