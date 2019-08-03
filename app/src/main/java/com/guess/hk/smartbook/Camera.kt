@@ -15,7 +15,6 @@ import java.util.*
 import android.hardware.camera2.CameraCharacteristics
 
 
-
 class Camera(private val manager: CameraManager, cameraFacing: Int, private val textureView: TextureView) {
     private lateinit var previewSize: Size
     private lateinit var cameraId: String
@@ -23,7 +22,7 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
     private var cameraDevice: CameraDevice? = null
     private var backgroundThread: HandlerThread? = null
     private var cameraSession: CameraCaptureSession? = null
-    private var captureRequestBuilder : CaptureRequest.Builder? = null
+    private var captureRequestBuilder: CaptureRequest.Builder? = null
     private var rect: Rect? = null
 
     private val stateCallback = object : CameraDevice.StateCallback() {
@@ -90,7 +89,7 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
         val surfaceView = textureView.surfaceTexture
         surfaceView.setDefaultBufferSize(previewSize.width, previewSize.height)
         val previewSurface = Surface(surfaceView)
-        captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
         captureRequestBuilder?.addTarget(previewSurface)
         cameraDevice?.createCaptureSession(
             Collections.singletonList(previewSurface),
@@ -118,7 +117,6 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
         cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
     }
 
-
     fun zoom(context: Context, zoomLevel : Int){
         val zoom = Rect(rect!!.left+zoomLevel, rect!!.top+zoomLevel,
             rect!!.right - zoomLevel, rect!!.bottom-zoomLevel
@@ -126,5 +124,4 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
         captureRequestBuilder?.set(CaptureRequest.SCALER_CROP_REGION, zoom)
         cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
     }
-
 }

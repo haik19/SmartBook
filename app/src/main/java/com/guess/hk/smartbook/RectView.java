@@ -20,6 +20,12 @@ public class RectView extends View {
 	private ArrayList<Corner> corners = new ArrayList<>();
 	private Paint linePaint;
 
+	protected float fingerSpacing = 0;
+	protected double zoomLevel = 0f;
+	protected float maximumZoomLevel = 5;
+	private ZoomChangeListener zoomChangeListener;
+
+
 	public RectView(Context context) {
 		this(context, null);
 	}
@@ -79,77 +85,89 @@ public class RectView extends View {
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
-		float X = event.getX();
-		float Y = event.getY();
-
-		switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				balID = findCorner(event);
-				break;
-
-			case MotionEvent.ACTION_MOVE:
-				if (event.getPointerCount() > 1 || balID == -1) {
-					return false;
+		if (event.getPointerCount() == 2) {
+			if (event.getAction() == MotionEvent.ACTION_MOVE) {
+				float currentFingerSpacing = getFingerSpacing(event);
+				if (fingerSpacing != 0) {
+					if (currentFingerSpacing > fingerSpacing && maximumZoomLevel > zoomLevel) {
+						zoomLevel += 0.05;
+					} else if (currentFingerSpacing < fingerSpacing && zoomLevel > 0) {
+						zoomLevel -= 0.05;
+					}
+					zoomChangeListener.zoomTo(zoomLevel);
 				}
+				fingerSpacing = currentFingerSpacing;
+			}
+		} else if (event.getPointerCount() == 1) {
+			float X = event.getX();
+			float Y = event.getY();
+			switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					balID = findCorner(event);
+					break;
+				case MotionEvent.ACTION_MOVE:
+					if (event.getPointerCount() > 1 || balID == -1) {
+						return false;
+					}
+					if (startX == -1) {
+						startX = corners.get(balID).getX();
+					}
 
-				if (startX == -1) {
-					startX = corners.get(balID).getX();
-				}
+					if (startY == -1) {
+						startY = corners.get(balID).getY();
+					}
 
-				if (startY == -1) {
-					startY = corners.get(balID).getY();
-				}
+					float deltaX = startX - event.getX();
+					float deltaY = startY - event.getY();
 
-				float deltaX = startX - event.getX();
-				float deltaY = startY - event.getY();
+					corners.get(balID).setX(X);
+					corners.get(balID).setY(Y);
+					switch (balID) {
+						case 0:
+							corners.get(1).setY((corners.get(1).getY() + deltaY));
+							corners.get(1).setX(corners.get(0).getX());
+							corners.get(3).setX((corners.get(3).getX() + deltaX));
+							corners.get(3).setY(corners.get(0).getY());
+							corners.get(2).setY(corners.get(1).getY());
+							corners.get(2).setX(corners.get(3).getX());
+							break;
 
-				corners.get(balID).setX(X);
-				corners.get(balID).setY(Y);
-				switch (balID) {
-					case 0:
-						corners.get(1).setY((corners.get(1).getY() + deltaY));
-						corners.get(1).setX(corners.get(0).getX());
-						corners.get(3).setX((corners.get(3).getX() + deltaX));
-						corners.get(3).setY(corners.get(0).getY());
-						corners.get(2).setY(corners.get(1).getY());
-						corners.get(2).setX(corners.get(3).getX());
-						break;
+						case 1:
+							corners.get(0).setY(corners.get(0).getY() + deltaY);
+							corners.get(0).setX(corners.get(1).getX());
+							corners.get(2).setX(corners.get(2).getX() + deltaX);
+							corners.get(2).setY(corners.get(1).getY());
+							corners.get(3).setX(corners.get(2).getX());
+							corners.get(3).setY(corners.get(0).getY());
+							break;
+						case 2:
+							corners.get(3).setY(corners.get(3).getY() + deltaY);
+							corners.get(3).setX(corners.get(2).getX());
+							corners.get(1).setX((corners.get(1).getX() + deltaX));
+							corners.get(1).setY(corners.get(2).getY());
+							corners.get(0).setY(corners.get(3).getY());
+							corners.get(0).setX(corners.get(1).getX());
+							break;
 
-					case 1:
-						corners.get(0).setY(corners.get(0).getY() + deltaY);
-						corners.get(0).setX(corners.get(1).getX());
-						corners.get(2).setX(corners.get(2).getX() + deltaX);
-						corners.get(2).setY(corners.get(1).getY());
-						corners.get(3).setX(corners.get(2).getX());
-						corners.get(3).setY(corners.get(0).getY());
-						break;
-					case 2:
-						corners.get(3).setY(corners.get(3).getY() + deltaY);
-						corners.get(3).setX(corners.get(2).getX());
-						corners.get(1).setX((corners.get(1).getX() + deltaX));
-						corners.get(1).setY(corners.get(2).getY());
-						corners.get(0).setY(corners.get(3).getY());
-						corners.get(0).setX(corners.get(1).getX());
-						break;
+						case 3:
+							corners.get(2).setY(corners.get(2).getY() + deltaY);
+							corners.get(2).setX(corners.get(3).getX());
+							corners.get(0).setX(corners.get(0).getX() + deltaX);
+							corners.get(0).setY(corners.get(3).getY());
+							corners.get(1).setY(corners.get(2).getY());
+							corners.get(1).setX(corners.get(0).getX());
+							break;
+					}
+					startX = event.getX();
+					startY = event.getY();
+					invalidate();
+					break;
 
-					case 3:
-						corners.get(2).setY(corners.get(2).getY() + deltaY);
-						corners.get(2).setX(corners.get(3).getX());
-						corners.get(0).setX(corners.get(0).getX() + deltaX);
-						corners.get(0).setY(corners.get(3).getY());
-						corners.get(1).setY(corners.get(2).getY());
-						corners.get(1).setX(corners.get(0).getX());
-						break;
-				}
-				startX = event.getX();
-				startY = event.getY();
-				invalidate();
-				break;
-
-			case MotionEvent.ACTION_UP:
-				startX  = -1;
-				startY  = -1;
-				break;
+				case MotionEvent.ACTION_UP:
+					startX = -1;
+					startY = -1;
+					break;
+			}
 		}
 		return true;
 	}
@@ -161,5 +179,19 @@ public class RectView extends View {
 			}
 		}
 		return -1;
+	}
+
+	private float getFingerSpacing(MotionEvent event) {
+		float x = event.getX(0) - event.getX(1);
+		float y = event.getY(0) - event.getY(1);
+		return (float) Math.sqrt(x * x + y * y);
+	}
+
+	public interface ZoomChangeListener {
+		void zoomTo(double zoomLevel);
+	}
+
+	public void setZoomChangeListener(ZoomChangeListener zoomChangeListener) {
+		this.zoomChangeListener = zoomChangeListener;
 	}
 }

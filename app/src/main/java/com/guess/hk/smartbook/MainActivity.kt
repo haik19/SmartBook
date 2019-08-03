@@ -36,6 +36,11 @@ class MainActivity : FragmentActivity() {
         textureView.isOpaque = false
         cameraManage = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK
+
+        rectView.setZoomChangeListener {
+            zoom_seek_bar.progress = (it * 10).toInt()
+        }
+
         textureListener = object : TextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
                 super.onSurfaceTextureAvailable(surface, width, height)
