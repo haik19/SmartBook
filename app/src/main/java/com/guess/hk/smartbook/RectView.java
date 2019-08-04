@@ -194,4 +194,8 @@ public class RectView extends View {
 	public void setZoomChangeListener(ZoomChangeListener zoomChangeListener) {
 		this.zoomChangeListener = zoomChangeListener;
 	}
+
+	public PointF[] getPoints() {
+		return points;
+	}
 }

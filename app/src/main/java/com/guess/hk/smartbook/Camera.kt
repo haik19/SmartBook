@@ -13,6 +13,11 @@ import android.view.TextureView
 import androidx.core.app.ActivityCompat
 import java.util.*
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+import android.hardware.camera2.CaptureRequest.CONTROL_AF_MODE
+import android.hardware.camera2.CaptureResult
+
+
 
 
 class Camera(private val manager: CameraManager, cameraFacing: Int, private val textureView: TextureView) {
@@ -24,6 +29,37 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
     private var cameraSession: CameraCaptureSession? = null
     private var captureRequestBuilder: CaptureRequest.Builder? = null
     private var rect: Rect? = null
+    private var areWeFocused : Boolean = false
+
+    var autoFocusCallback : AutoFocusCallback? = null
+
+    private val mCaptureCallback = object : CameraCaptureSession.CaptureCallback() {
+        fun process(result: CaptureResult){
+            val afState = result.get(CaptureResult.CONTROL_AF_STATE)
+            if (CaptureResult.CONTROL_AF_TRIGGER_START == afState) {
+                if (areWeFocused) {
+                    autoFocusCallback?.focusDetected()
+                }
+            }
+            areWeFocused = CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED == afState
+        }
+
+        override fun onCaptureProgressed(
+            session: CameraCaptureSession,
+            request: CaptureRequest,
+            partialResult: CaptureResult
+        ) {
+            process(partialResult)
+        }
+
+        override fun onCaptureCompleted(
+            session: CameraCaptureSession,
+            request: CaptureRequest,
+            result: TotalCaptureResult
+        ) {
+            process(result)
+        }
+    }
 
     private val stateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
@@ -96,10 +132,11 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
             object : CameraCaptureSession.StateCallback() {
                 override fun onConfigured(session: CameraCaptureSession) {
                     cameraSession = session
-                    val captureRequest = captureRequestBuilder?.build()
-                    session.setRepeatingRequest(captureRequest, null, backgroundHandler)
+                    captureRequestBuilder?.set(CONTROL_AF_MODE, CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                    captureRequestBuilder?.build().apply {
+                        session.setRepeatingRequest(this, mCaptureCallback, backgroundHandler)
+                    }
                 }
-
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                 }
             },
@@ -108,20 +145,41 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
 
     }
 
-     fun lock() {
-        cameraSession?.capture(captureRequestBuilder?.build(),
-            null, backgroundHandler)
+    fun lock() {
+        captureRequestBuilder?.let {
+            cameraSession?.capture(it.build(), mCaptureCallback, backgroundHandler)
+        }
     }
 
     fun unLock() {
-        cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
+        captureRequestBuilder?.let {
+            cameraSession?.setRepeatingRequest(it.build(), mCaptureCallback, backgroundHandler)
+        }
     }
 
-    fun zoom(context: Context, zoomLevel : Int){
-        val zoom = Rect(rect!!.left+zoomLevel, rect!!.top+zoomLevel,
-            rect!!.right - zoomLevel, rect!!.bottom-zoomLevel
-        )
-        captureRequestBuilder?.set(CaptureRequest.SCALER_CROP_REGION, zoom)
-        cameraSession?.setRepeatingRequest(captureRequestBuilder?.build(), null, backgroundHandler)
+    fun zoom(zoomLevel: Int) {
+        captureRequestBuilder?.let {
+            val zoom = Rect(
+                rect!!.left + zoomLevel, rect!!.top + zoomLevel,
+                rect!!.right - zoomLevel, rect!!.bottom - zoomLevel
+            )
+            captureRequestBuilder?.set(CaptureRequest.SCALER_CROP_REGION, zoom)
+            cameraSession?.setRepeatingRequest(it.build(), mCaptureCallback, backgroundHandler)
+        }
+    }
+
+    fun turnOnFlash() {
+        captureRequestBuilder?.let {
+            if (captureRequestBuilder?.get(CaptureRequest.FLASH_MODE) == CaptureRequest.FLASH_MODE_TORCH) {
+                captureRequestBuilder?.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
+            } else {
+                captureRequestBuilder?.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH)
+            }
+            cameraSession?.setRepeatingRequest(it.build(), mCaptureCallback, backgroundHandler)
+        }
+    }
+
+    interface AutoFocusCallback {
+        fun focusDetected()
     }
 }

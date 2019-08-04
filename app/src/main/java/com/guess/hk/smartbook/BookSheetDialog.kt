@@ -28,9 +28,7 @@ class BookSheetDialog : BottomSheetDialogFragment(){
         first_url.setOnClickListener(urlsBtnClicklistener)
         second_url.setOnClickListener(urlsBtnClicklistener)
         three_url.setOnClickListener(urlsBtnClicklistener)
-
     }
-
 
    private val urlsBtnClicklistener = View.OnClickListener {
        val textView = it as TextView

@@ -31,6 +31,32 @@
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginBottom="24dp"
             android:max="50"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toTopOf="@id/take_photo"/>
+
+    <ImageView
+            android:id="@+id/take_photo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="32dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:src="@drawable/ic_circular_shape_silhouette">
+    </ImageView>
+
+    <ImageView
+               android:id="@+id/flash"
+               android:layout_width="32dp"
+               android:layout_height="32dp"
+               app:layout_constraintRight_toRightOf="parent"
+               app:layout_constraintTop_toTopOf="parent"
+               android:layout_margin="16dp"
+               android:clickable="true"
+               android:focusable="true"
+               android:background="?selectableItemBackground"
+               android:src="@drawable/ic_flash"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

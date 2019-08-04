@@ -1,6 +1,7 @@
 package com.guess.hk.smartbook
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
@@ -11,6 +12,7 @@ import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,15 +25,18 @@ class MainActivity : FragmentActivity() {
     private lateinit var textureView: TextureView
     private lateinit var textureListener: TextureListener
     private lateinit var camera: Camera
+    private lateinit var bottomSheetFragment : BookSheetDialog
+
     private val detector = FirebaseVision.getInstance()
         .onDeviceTextRecognizer
+
+    private val booksDataManager = BooksDataManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
-        val booksDataManager = BooksDataManager()
         textureView = texture_view
         textureView.isOpaque = false
         cameraManage = getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -47,26 +52,26 @@ class MainActivity : FragmentActivity() {
                 camera = Camera(cameraManage, cameraFacing, textureView).apply {
                     openCamera(textureView.context)
                 }
+
+                camera.autoFocusCallback = object : Camera.AutoFocusCallback {
+                    override fun focusDetected() {
+                        if (textureView.isAvailable) {
+                            recognizePicture()
+                        }
+                    }
+                }
             }
         }
         textureView.setOnClickListener {
-            camera.lock()
-            val image = FirebaseVisionImage.fromBitmap(textureView.bitmap)
-            detector.processImage(image).addOnSuccessListener { it1 ->
-                camera.unLock()
-                val textKey = it1.text.replace("\n", " ")
-                val book = booksDataManager.findBookById(textKey)
-                val bottomSheetFragment = BookSheetDialog()
-                if (book is ArrayList) {
-                    bottomSheetFragment.urls = book
-                    bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-                } else {
-                    Toast.makeText(this, "Not recognized!", Toast.LENGTH_SHORT).show()
-                }
-            }.addOnFailureListener() {
-                Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
-                camera.unLock()
-            }
+            recognizePicture()
+        }
+
+        take_photo.setOnClickListener{
+            recognizePicture()
+        }
+
+        flash.setOnClickListener{
+            camera.turnOnFlash()
         }
 
         zoom_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
@@ -77,10 +82,9 @@ class MainActivity : FragmentActivity() {
             }
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                camera.zoom(this@MainActivity, progress*20)
+                camera.zoom(progress * 20)
             }
         })
-
     }
 
     override fun onResume() {
@@ -96,15 +100,45 @@ class MainActivity : FragmentActivity() {
 
     override fun onStop() {
         super.onStop()
-        if(::camera.isInitialized){
+        if (::camera.isInitialized) {
             camera.closeCamera()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if(::camera.isInitialized){
+        if (::camera.isInitialized) {
             camera.closeCamera()
+        }
+    }
+
+    private fun recognizePicture() {
+        if (::bottomSheetFragment.isInitialized && bottomSheetFragment.isVisible) {
+            return
+        }
+        camera.lock()
+        val finalBitmap = Bitmap.createBitmap(
+            textureView.bitmap,
+            rectView.points[1].x.toInt(),
+            rectView.points[1].y.toInt(),
+            (rectView.points[2].x - rectView.points[1].x).toInt(),
+            (rectView.points[3].y - rectView.points[2].y).toInt()  //crop bitmap
+        )
+        camera.unLock()
+        val image = FirebaseVisionImage.fromBitmap(finalBitmap)
+        detector.processImage(image).addOnSuccessListener { it1 ->
+            val textKey = it1.text.replace("\n", " ")
+            val book = booksDataManager.findBookById(textKey)
+            bottomSheetFragment = BookSheetDialog()
+            if (book is ArrayList) {
+                bottomSheetFragment.urls = book
+                bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+            } else {
+                Toast.makeText(this, "Not recognized!", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener() {
+            Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
+            camera.unLock()
         }
     }
 }
