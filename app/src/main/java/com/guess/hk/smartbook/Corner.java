@@ -7,17 +7,15 @@ import android.graphics.PointF;
 
 public class Corner {
 
-	Bitmap bitmap;
-	Context mContext;
-	PointF point;
-	int id;
-	static int count = 0;
+	private Bitmap bitmap;
+	private PointF point;
+	private int id;
+	private static int count = 0;
 
 	public Corner(Context context, int resourceId, PointF point) {
 		this.id = count++;
 		bitmap = BitmapFactory.decodeResource(context.getResources(),
 				resourceId);
-		mContext = context;
 		this.point = point;
 	}
 

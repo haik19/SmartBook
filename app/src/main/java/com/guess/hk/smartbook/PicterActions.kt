@@ -22,12 +22,14 @@ private fun saveImage(finalBitmap: Bitmap, image_name: String) {
     fos.close()
 }
 
- fun openLink(context: Context, url: String) {
+fun openLink(context: Context, url: String) {
     val intent = Intent(
         Intent.ACTION_VIEW,
         Uri.parse(url)
     )
-    context.startActivity(intent)
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(intent)
+    }
 }
 
 fun getScreenWidthInPx(context: Context): Int {

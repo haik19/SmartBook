@@ -18,8 +18,6 @@ import android.hardware.camera2.CaptureRequest.CONTROL_AF_MODE
 import android.hardware.camera2.CaptureResult
 
 
-
-
 class Camera(private val manager: CameraManager, cameraFacing: Int, private val textureView: TextureView) {
     private lateinit var previewSize: Size
     private lateinit var cameraId: String

@@ -130,8 +130,8 @@ class MainActivity : FragmentActivity() {
             val textKey = it1.text.replace("\n", " ")
             val book = booksDataManager.findBookById(textKey)
             bottomSheetFragment = BookSheetDialog()
-            if (book is ArrayList) {
-                bottomSheetFragment.urls = book
+            if (book.isNotEmpty()) {
+                bottomSheetFragment.urls = book as ArrayList<String>
                 bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
             } else {
                 Toast.makeText(this, "Not recognized!", Toast.LENGTH_SHORT).show()
