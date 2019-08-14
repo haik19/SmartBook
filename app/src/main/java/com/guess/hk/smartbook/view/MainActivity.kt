@@ -12,9 +12,9 @@ import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.guess.hk.smartbook.db.BooksDataManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 
