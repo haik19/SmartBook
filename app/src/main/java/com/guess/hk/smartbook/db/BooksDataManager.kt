@@ -1,4 +1,4 @@
-package com.guess.hk.smartbook
+package com.guess.hk.smartbook.db
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -6,20 +6,27 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.guess.hk.smartbook.model.BookKey
 import java.util.*
 
 class BooksDataManager {
 
-    private val booksData = arrayListOf<Book>()
+    private val booksData = arrayListOf<BookKey>()
+    private val dbName = "keys"
+    private val versionName = "versionName"
+
+    companion object {
+        val instance = BooksDataManager()
+    }
 
     init {
         val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("books")
+        val myRef = database.getReference(dbName)
 
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (postSnapshot in dataSnapshot.children) {
-                    val book = postSnapshot.getValue(Book::class.java)
+                    val book = postSnapshot.getValue(BookKey::class.java)
                     book?.let {
                         booksData.add(it)
                     }

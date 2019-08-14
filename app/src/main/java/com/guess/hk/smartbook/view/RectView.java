@@ -1,4 +1,4 @@
-package com.guess.hk.smartbook;
+package com.guess.hk.smartbook.view;
 
 import java.util.ArrayList;
 import android.content.Context;
@@ -6,6 +6,9 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import com.guess.hk.smartbook.model.Corner;
+import com.guess.hk.smartbook.PicterActionsKt;
+import com.guess.hk.smartbook.R;
 
 public class RectView extends View {
 

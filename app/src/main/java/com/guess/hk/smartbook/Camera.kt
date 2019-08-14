@@ -18,9 +18,11 @@ import android.hardware.camera2.CaptureRequest.CONTROL_AF_MODE
 import android.hardware.camera2.CaptureResult
 
 
-class Camera(private val manager: CameraManager, cameraFacing: Int, private val textureView: TextureView) {
+class Camera( private val textureView: TextureView) {
     private lateinit var previewSize: Size
     private lateinit var cameraId: String
+    private val cameraManager: CameraManager =  textureView.context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+    
     private var backgroundHandler: Handler? = null
     private var cameraDevice: CameraDevice? = null
     private var backgroundThread: HandlerThread? = null
@@ -77,9 +79,9 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
     }
 
     init {
-        for (cameraId in manager.cameraIdList) {
-            val characteristics = manager.getCameraCharacteristics(cameraId)
-            if (characteristics.get(CameraCharacteristics.LENS_FACING) == cameraFacing) {
+        for (cameraId in cameraManager.cameraIdList) {
+            val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+            if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
                 val streamConfigurationMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                 if (streamConfigurationMap != null) {
                     previewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture::class.java)[0]
@@ -103,7 +105,7 @@ class Camera(private val manager: CameraManager, cameraFacing: Int, private val 
                 android.Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            manager.openCamera(cameraId, stateCallback, backgroundHandler)
+            cameraManager.openCamera(cameraId, stateCallback, backgroundHandler)
         }
     }
 

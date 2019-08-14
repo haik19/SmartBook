@@ -1,3 +1,7 @@
 package com.guess.hk.smartbook.usecase
 
-class GetVersionUseCase
+import com.guess.hk.smartbook.repo.KeysRepo
+
+class GetVersionUseCase(val repo : KeysRepo) {
+    fun getVersion() = repo.getVersion()
+}

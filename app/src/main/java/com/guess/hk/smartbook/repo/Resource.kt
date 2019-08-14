@@ -1,4 +1,4 @@
-package com.guess.hk.smartbook
+package com.guess.hk.smartbook.repo
 
 sealed class Resource<T>(
    val data: T? = null,
