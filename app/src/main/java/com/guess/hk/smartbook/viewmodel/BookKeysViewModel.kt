@@ -1,47 +1,46 @@
 package com.guess.hk.smartbook.viewmodel
 
-import android.graphics.Bitmap
-import android.widget.Toast
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.TaskExecutors
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.database.core.Repo
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.guess.hk.smartbook.db.BooksDataManager
-import com.guess.hk.smartbook.model.BookKey
+import com.guess.hk.smartbook.db.BookKeyDao
 import com.guess.hk.smartbook.repo.KeysRepo
 import com.guess.hk.smartbook.repo.KeysRepoImpl
 import com.guess.hk.smartbook.repo.Resource
+import com.guess.hk.smartbook.usecase.DataAvailableUseCase
 import com.guess.hk.smartbook.usecase.GetVersionUseCase
 import com.guess.hk.smartbook.usecase.RecognizeKeyUseCase
-import java.security.KeyRep
 
 class BookKeysViewModel : ViewModel() {
 
-    private val booksDataManager = BooksDataManager()
     private val repo: KeysRepo = KeysRepoImpl()
-    private val keysLiveData = MutableLiveData<Resource<List<BookKey>>>()
 
-    private val recognizeKeyUseCase = RecognizeKeyUseCase()
+    private val recognizeKeyUseCase = RecognizeKeyUseCase(repo)
     val recognizedKeyLiveData = MediatorLiveData<Resource<List<String>>>()
 
     val versionLiveData = MediatorLiveData<Resource<String>>()
 
+    val dataAvailbleLiveData = MediatorLiveData<Resource<String>>()
 
-    fun getKeysFromeNet() {
-
-    }
-
-    fun recognizeKey(firebaseVisionImage: FirebaseVisionImage) {
-        val liveData = recognizeKeyUseCase.recognizeText(firebaseVisionImage)
+    fun recognizeKey(fireBaseVisionImage: FirebaseVisionImage) {
+        val liveData = recognizeKeyUseCase.recognizeText(fireBaseVisionImage)
         TaskExecutors.MAIN_THREAD.execute {
             recognizedKeyLiveData.addSource(liveData) {
                 recognizedKeyLiveData.postValue(it)
                 recognizedKeyLiveData.removeSource(liveData)
             }
+        }
+    }
 
+    fun checkData(isDataChanged: Boolean) {
+        val dataAvailableUseCase = DataAvailableUseCase(repo, isDataChanged)
+        val liveData = dataAvailableUseCase.fetChData()
+        dataAvailbleLiveData.addSource(liveData) {
+            dataAvailbleLiveData.postValue(it)
+            if (it !is Resource.Loading) {
+                dataAvailbleLiveData.removeSource(liveData)
+            }
         }
     }
 
@@ -52,6 +51,11 @@ class BookKeysViewModel : ViewModel() {
             versionLiveData.postValue(it)
             versionLiveData.removeSource(liveData)
         }
+    }
+
+    fun initDb(booksDao: BookKeyDao) {
+        val im = repo as KeysRepoImpl //TODO CHANGE
+        im.bookKeyDao = booksDao
     }
 
 }

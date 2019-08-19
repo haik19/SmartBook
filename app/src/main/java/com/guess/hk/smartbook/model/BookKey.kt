@@ -1,10 +1,19 @@
 package com.guess.hk.smartbook.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.IgnoreExtraProperties
 
 @IgnoreExtraProperties
-data class BookKey(val id: String, val url1 : String, val url2 : String, val url3 : String) {
+@Entity
+data class BookKey(
+    @PrimaryKey
+    val id: String,
+    val url1: String,
+    val url2: String,
+    val url3: String
+) {
 
     @Exclude
     fun toMap(): Map<String, Any?> {
@@ -15,6 +24,7 @@ data class BookKey(val id: String, val url1 : String, val url2 : String, val url
             "url3" to url3
         )
     }
-   constructor() : this("-1","","","")
+
+    constructor() : this("-1", "", "", "")
 
 }

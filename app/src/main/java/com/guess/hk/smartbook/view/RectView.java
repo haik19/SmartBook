@@ -45,7 +45,7 @@ public class RectView extends View {
 		setLayerType(LAYER_TYPE_HARDWARE, null);
 
 		setFocusable(true);
-		float screenHeight = PicterActionsKt.getScreenHeigthInPx(context);
+		float screenHeight = PicterActionsKt.getScreenHeightInPx(context);
 		float screenWidth = PicterActionsKt.getScreenWidthInPx(context);
 		float rectHeight = PicterActionsKt.convertDpToPixel(100);
 		float rectWidth = PicterActionsKt.convertDpToPixel(100);

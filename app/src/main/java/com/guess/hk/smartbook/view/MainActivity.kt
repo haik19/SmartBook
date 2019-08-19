@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.SeekBar
@@ -14,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.guess.hk.smartbook.Camera
 import com.guess.hk.smartbook.R
+import com.guess.hk.smartbook.SmartBookApplication
 import com.guess.hk.smartbook.repo.Resource
 import com.guess.hk.smartbook.view.liseners.TextureListener
 import com.guess.hk.smartbook.viewmodel.BookKeysViewModel
@@ -27,8 +30,8 @@ class MainActivity : FragmentActivity() {
     }
 
     private lateinit var camera: Camera
-    private lateinit var bottomSheetFragment : BookSheetDialog
-    private lateinit var bookKeysViewModel : BookKeysViewModel
+    private lateinit var bottomSheetFragment: BookSheetDialog
+    private lateinit var bookKeysViewModel: BookKeysViewModel
     private val textureListener = object : TextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
             super.onSurfaceTextureAvailable(surface, width, height)
@@ -43,6 +46,7 @@ class MainActivity : FragmentActivity() {
         }
     }
     private var dataVersion: String? = null
+    private var isDataAvailable = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +61,12 @@ class MainActivity : FragmentActivity() {
         initListeners()
 
         bookKeysViewModel = ViewModelProviders.of(this).get(BookKeysViewModel::class.java)
+        bookKeysViewModel.initDb((applicationContext as SmartBookApplication).db.booksKeyDao())
+
+        bookKeysViewModel.getVersion()
+
         bookKeysViewModel.recognizedKeyLiveData.observe(this, Observer {
+            Log.d("MainActivityTest", "recognize")
             when (it) {
                 is Resource.Success -> {
                     val book = it.data
@@ -79,22 +88,40 @@ class MainActivity : FragmentActivity() {
         bookKeysViewModel.versionLiveData.observe(this, Observer {
             when (it) {
                 is Resource.Success -> {
-                    if (dataVersion.equals(it.data)) {
-                        println("read from db")
-                    } else {
-                        println("read from net")
+                    val isDataChanged = !dataVersion.equals(it.data)
+                    if (isDataChanged) {
                         preferenceManager.edit().putString(DATA_VERSION_KEY, it.data).apply()
                     }
-
+                    Log.d("MainActivityTest", "version Success $isDataChanged")
+                    bookKeysViewModel.checkData(isDataChanged)
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    Log.d("MainActivityTest", "version error")
                 }
             }
         })
 
-        bookKeysViewModel.getVersion()
-
+        bookKeysViewModel.dataAvailbleLiveData.observe(this, Observer {
+            isDataAvailable = false
+            when (it) {
+                is Resource.Loading -> {
+                    Toast.makeText(this, "need sync", Toast.LENGTH_SHORT).show()
+                    Log.d("MainActivityTest", "check data loading")
+                    progress.visibility = View.VISIBLE
+                }
+                is Resource.Success -> {
+                    isDataAvailable = true
+                    Log.d("MainActivityTest", "check data succses")
+                    progress.visibility = View.GONE
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    Log.d("MainActivityTest", "error")
+                    progress.visibility = View.GONE
+                }
+            }
+        })
     }
 
     override fun onResume() {
@@ -121,7 +148,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun recognizePicture() {
-        if (::bottomSheetFragment.isInitialized && bottomSheetFragment.isVisible) {
+        if (!isDataAvailable && ::bottomSheetFragment.isInitialized && bottomSheetFragment.isVisible) {
             return
         }
         camera.lock()
@@ -137,20 +164,20 @@ class MainActivity : FragmentActivity() {
     }
 
 
-    private fun initListeners(){
+    private fun initListeners() {
         texture_view.setOnClickListener {
             recognizePicture()
         }
 
-        take_photo.setOnClickListener{
+        take_photo.setOnClickListener {
             recognizePicture()
         }
 
-        flash.setOnClickListener{
+        flash.setOnClickListener {
             camera.turnOnFlash()
         }
 
-        zoom_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        zoom_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
 

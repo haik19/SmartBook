@@ -39,7 +39,7 @@ fun getScreenWidthInPx(context: Context): Int {
     return metrics.widthPixels
 }
 
-fun getScreenHeigthInPx(context: Context): Int {
+fun getScreenHeightInPx(context: Context): Int {
     val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
     val metrics = DisplayMetrics()
     display.getMetrics(metrics)
