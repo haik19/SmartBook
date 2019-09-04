@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.guess.hk.smartbook.db.BookKeyDao
+import com.guess.hk.smartbook.model.BookKey
 import com.guess.hk.smartbook.repo.KeysRepo
 import com.guess.hk.smartbook.repo.KeysRepoImpl
 import com.guess.hk.smartbook.repo.Resource
@@ -17,11 +18,11 @@ class BookKeysViewModel : ViewModel() {
     private val repo: KeysRepo = KeysRepoImpl()
 
     private val recognizeKeyUseCase = RecognizeKeyUseCase(repo)
-    val recognizedKeyLiveData = MediatorLiveData<Resource<List<String>>>()
+    val recognizedKeyLiveData = MediatorLiveData<Resource<BookKey>>()
 
     val versionLiveData = MediatorLiveData<Resource<String>>()
 
-    val dataAvailbleLiveData = MediatorLiveData<Resource<String>>()
+    val dataAvailableLiveData = MediatorLiveData<Resource<String>>()
 
     fun recognizeKey(fireBaseVisionImage: FirebaseVisionImage) {
         val liveData = recognizeKeyUseCase.recognizeText(fireBaseVisionImage)
@@ -36,10 +37,10 @@ class BookKeysViewModel : ViewModel() {
     fun checkData(isDataChanged: Boolean) {
         val dataAvailableUseCase = DataAvailableUseCase(repo, isDataChanged)
         val liveData = dataAvailableUseCase.fetChData()
-        dataAvailbleLiveData.addSource(liveData) {
-            dataAvailbleLiveData.postValue(it)
+        dataAvailableLiveData.addSource(liveData) {
+            dataAvailableLiveData.postValue(it)
             if (it !is Resource.Loading) {
-                dataAvailbleLiveData.removeSource(liveData)
+                dataAvailableLiveData.removeSource(liveData)
             }
         }
     }

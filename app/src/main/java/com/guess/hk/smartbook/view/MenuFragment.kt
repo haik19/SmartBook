@@ -5,17 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.fragment.app.Fragment
 import com.guess.hk.smartbook.R
+import com.guess.hk.smartbook.model.BookKey
 import com.guess.hk.smartbook.openLink
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_dialog.*
 
-class BookSheetDialog : BottomSheetDialogFragment(){
+class MenuFragment : Fragment(){
 
-    var urls = arrayListOf<String>()
-    set(value) {
-        urls.addAll(value)
-    }
+    var bookKey : BookKey? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false)
@@ -23,10 +21,11 @@ class BookSheetDialog : BottomSheetDialogFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        first_url.text = urls[0]
-        second_url.text = urls[1]
-        three_url.text = urls[2]
-
+        bookKey?.let {
+//            first_url.text = it.url1
+//            second_url.text = it.url2
+//            three_url.text = it.url3
+        }
         first_url.setOnClickListener(urlsBtnClicklistener)
         second_url.setOnClickListener(urlsBtnClicklistener)
         three_url.setOnClickListener(urlsBtnClicklistener)

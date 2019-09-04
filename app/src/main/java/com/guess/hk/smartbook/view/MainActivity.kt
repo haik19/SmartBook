@@ -30,7 +30,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private lateinit var camera: Camera
-    private lateinit var bottomSheetFragment: BookSheetDialog
+    private var menuFragment: MenuFragment? = null
     private lateinit var bookKeysViewModel: BookKeysViewModel
     private val textureListener = object : TextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
@@ -69,21 +69,22 @@ class MainActivity : FragmentActivity() {
             Log.d("MainActivityTest", "recognize")
             when (it) {
                 is Resource.Success -> {
-                    val book = it.data
-                    bottomSheetFragment = BookSheetDialog()
-                    if (book?.isNotEmpty() == true) {
-                        bottomSheetFragment.urls = book as ArrayList<String>
-                        bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-                    } else {
-                        Toast.makeText(this, "Not recognized!", Toast.LENGTH_SHORT).show()
+                    menuFragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container) as? MenuFragment
+                    if (menuFragment == null) {
+                        menuFragment = MenuFragment()
+                        menuFragment!!.bookKey = it.data
+                        supportFragmentManager.beginTransaction()
+                            .add(R.id.fragment_container, menuFragment!!)
+                            .commit()
                     }
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
                 }
-            }
-            camera.unLock()
-        })
+		    }
+		    camera.unLock()
+	    })
 
         bookKeysViewModel.versionLiveData.observe(this, Observer {
             when (it) {
@@ -102,7 +103,7 @@ class MainActivity : FragmentActivity() {
             }
         })
 
-        bookKeysViewModel.dataAvailbleLiveData.observe(this, Observer {
+        bookKeysViewModel.dataAvailableLiveData.observe(this, Observer {
             isDataAvailable = false
             when (it) {
                 is Resource.Loading -> {
@@ -148,7 +149,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun recognizePicture() {
-        if (!isDataAvailable && ::bottomSheetFragment.isInitialized && bottomSheetFragment.isVisible) {
+        if (!isDataAvailable && menuFragment?.isVisible == true) {
             return
         }
         camera.lock()
