@@ -15,12 +15,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.guess.hk.smartbook.Camera
-import com.guess.hk.smartbook.R
 import com.guess.hk.smartbook.SmartBookApplication
 import com.guess.hk.smartbook.repo.Resource
 import com.guess.hk.smartbook.view.liseners.TextureListener
 import com.guess.hk.smartbook.viewmodel.BookKeysViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import android.app.ActionBar
+import com.guess.hk.smartbook.R
 
 
 class MainActivity : FragmentActivity() {
@@ -69,15 +70,11 @@ class MainActivity : FragmentActivity() {
             Log.d("MainActivityTest", "recognize")
             when (it) {
                 is Resource.Success -> {
-                    menuFragment =
-                        supportFragmentManager.findFragmentById(R.id.fragment_container) as? MenuFragment
-                    if (menuFragment == null) {
-                        menuFragment = MenuFragment()
-                        menuFragment!!.bookKey = it.data
-                        supportFragmentManager.beginTransaction()
-                            .add(R.id.fragment_container, menuFragment!!)
-                            .commit()
-                    }
+                    val d = MenuFragment()
+                    d.camera = camera
+                    d.bookKey = it.data
+
+                    d.show(supportFragmentManager,"dialogTag")
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
