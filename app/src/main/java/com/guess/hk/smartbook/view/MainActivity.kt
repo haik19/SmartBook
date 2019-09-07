@@ -20,7 +20,6 @@ import com.guess.hk.smartbook.repo.Resource
 import com.guess.hk.smartbook.view.liseners.TextureListener
 import com.guess.hk.smartbook.viewmodel.BookKeysViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import android.app.ActionBar
 import com.guess.hk.smartbook.R
 
 
@@ -70,17 +69,28 @@ class MainActivity : FragmentActivity() {
             Log.d("MainActivityTest", "recognize")
             when (it) {
                 is Resource.Success -> {
+                    if (supportFragmentManager.findFragmentByTag("dialogTag") != null) {
+                        camera.inProgress = false
+                        return@Observer
+                    }
                     val d = MenuFragment()
                     d.camera = camera
                     d.bookKey = it.data
 
                     d.show(supportFragmentManager,"dialogTag")
+                    camera.inProgress = false
+                    camera.stopRepeating()
+                    if(menuFragment?.isVisible == false){
+                        camera.unLock()
+                    }
                 }
                 is Resource.Error -> {
-                    Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
+                    camera.inProgress = false
+                    if(menuFragment?.isVisible == false){
+                        camera.unLock()
+                    }
                 }
 		    }
-		    camera.unLock()
 	    })
 
         bookKeysViewModel.versionLiveData.observe(this, Observer {

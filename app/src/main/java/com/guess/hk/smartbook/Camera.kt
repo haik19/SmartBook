@@ -29,20 +29,17 @@ class Camera( private val textureView: TextureView) {
     private var cameraSession: CameraCaptureSession? = null
     private var captureRequestBuilder: CaptureRequest.Builder? = null
     private var rect: Rect? = null
-    private var areWeFocused : Boolean = false
-    private var continueRecognize = true
+    var inProgress: Boolean = false
+    var continueRecognize = true
 
     var autoFocusCallback : AutoFocusCallback? = null
 
     private val mCaptureCallback = object : CameraCaptureSession.CaptureCallback() {
-        fun process(result: CaptureResult){
-            val afState = result.get(CaptureResult.CONTROL_AF_STATE)
-            if (CaptureResult.CONTROL_AF_TRIGGER_START == afState) {
-                if (areWeFocused && continueRecognize) {
-                    autoFocusCallback?.focusDetected()
-                }
+        fun process(result: CaptureResult) {
+            if (!inProgress && continueRecognize) {
+                autoFocusCallback?.focusDetected()
+                inProgress = true
             }
-            areWeFocused = CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED == afState
         }
 
         override fun onCaptureProgressed(
@@ -180,12 +177,8 @@ class Camera( private val textureView: TextureView) {
         }
     }
 
-    fun stopRecognize() {
-        continueRecognize = false
-    }
-
-    fun startRecognize() {
-        continueRecognize = true
+    fun stopRepeating (){
+        cameraSession?.stopRepeating()
     }
 
     interface AutoFocusCallback {

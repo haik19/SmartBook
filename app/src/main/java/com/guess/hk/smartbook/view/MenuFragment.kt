@@ -49,7 +49,8 @@ class MenuFragment : DialogFragment(){
         dialog.window?.setBackgroundDrawable( ColorDrawable(Color.TRANSPARENT))
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
-            camera?.stopRecognize()
+            camera?.continueRecognize = false
+            println("test rec listener")
         }
         return dialog
     }
@@ -63,7 +64,8 @@ class MenuFragment : DialogFragment(){
         }
 
     override fun onCancel(dialog: DialogInterface?) {
-        camera?.startRecognize()
+        camera?.continueRecognize = true
+        camera?.unLock()
         super.onCancel(dialog)
     }
 
