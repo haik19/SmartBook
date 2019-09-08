@@ -45,7 +45,7 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
-    private var dataVersion: String? = null
+    private var dataVersionCode: Long = 0
     private var isDataAvailable = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +55,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
 
         val preferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-        dataVersion = preferenceManager.getString(DATA_VERSION_KEY, "")
+        dataVersionCode = preferenceManager.getLong(DATA_VERSION_KEY, 0)
 
         texture_view.isOpaque = false
         initListeners()
@@ -96,9 +96,9 @@ class MainActivity : FragmentActivity() {
         bookKeysViewModel.versionLiveData.observe(this, Observer {
             when (it) {
                 is Resource.Success -> {
-                    val isDataChanged = !dataVersion.equals(it.data)
+                    val isDataChanged = it.data!! > dataVersionCode
                     if (isDataChanged) {
-                        preferenceManager.edit().putString(DATA_VERSION_KEY, it.data).apply()
+                        preferenceManager.edit().putLong(DATA_VERSION_KEY, it.data).apply()
                     }
                     Log.d("MainActivityTest", "version Success $isDataChanged")
                     bookKeysViewModel.checkData(isDataChanged)

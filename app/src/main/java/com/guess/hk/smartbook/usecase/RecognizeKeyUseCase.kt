@@ -2,10 +2,8 @@ package com.guess.hk.smartbook.usecase
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.guess.hk.smartbook.db.BookKeyDao
 import com.guess.hk.smartbook.model.BookKey
 import com.guess.hk.smartbook.repo.KeysRepo
 import com.guess.hk.smartbook.repo.Resource

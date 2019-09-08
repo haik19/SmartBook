@@ -4,7 +4,7 @@ import com.guess.hk.smartbook.model.BookKey
 
 interface KeysRepo {
 
-    fun getVersion(): LiveData<Resource<String>>
+    fun getVersion(): LiveData<Resource<Long>>
 
     fun initBookKeys(isDataChanged : Boolean) : LiveData<Resource<String>>
 

@@ -15,6 +15,6 @@ interface BookKeyDao {
     fun insert(bookKey: BookKey)
 
     @Query("DELETE FROM BookKey")
-    fun deleteTable()
+    fun deleteTableData()
 
 }

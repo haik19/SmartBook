@@ -20,7 +20,7 @@ class BookKeysViewModel : ViewModel() {
     private val recognizeKeyUseCase = RecognizeKeyUseCase(repo)
     val recognizedKeyLiveData = MediatorLiveData<Resource<BookKey>>()
 
-    val versionLiveData = MediatorLiveData<Resource<String>>()
+    val versionLiveData = MediatorLiveData<Resource<Long>>()
 
     val dataAvailableLiveData = MediatorLiveData<Resource<String>>()
 
