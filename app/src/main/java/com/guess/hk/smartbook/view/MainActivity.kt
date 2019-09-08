@@ -1,5 +1,7 @@
 package com.guess.hk.smartbook.view
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.os.Bundle
@@ -10,6 +12,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,28 +24,22 @@ import com.guess.hk.smartbook.view.liseners.TextureListener
 import com.guess.hk.smartbook.viewmodel.BookKeysViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import com.guess.hk.smartbook.R
+import kotlinx.android.synthetic.main.permisson_view_container.*
 
 
 class MainActivity : FragmentActivity() {
 
     companion object {
         const val DATA_VERSION_KEY = "app.version.key"
+        const val CAMERA_REQUEST_CODE = 101
     }
-
     private lateinit var camera: Camera
     private var menuFragment: MenuFragment? = null
     private lateinit var bookKeysViewModel: BookKeysViewModel
     private val textureListener = object : TextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
             super.onSurfaceTextureAvailable(surface, width, height)
-            camera = Camera(texture_view).apply {
-                openCamera(texture_view.context)
-            }
-            camera.autoFocusCallback = object : Camera.AutoFocusCallback {
-                override fun focusDetected() {
-                    recognizePicture()
-                }
-            }
+           initCamera()
         }
     }
     private var dataVersionCode: Long = 0
@@ -114,30 +111,43 @@ class MainActivity : FragmentActivity() {
             isDataAvailable = false
             when (it) {
                 is Resource.Loading -> {
-                    Toast.makeText(this, "need sync", Toast.LENGTH_SHORT).show()
                     Log.d("MainActivityTest", "check data loading")
-                    progress.visibility = View.VISIBLE
                 }
                 is Resource.Success -> {
                     isDataAvailable = true
                     Log.d("MainActivityTest", "check data succses")
-                    progress.visibility = View.GONE
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
                     Log.d("MainActivityTest", "error")
-                    progress.visibility = View.GONE
                 }
             }
         })
+        allow_access_btn.setOnClickListener {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (texture_view.isAvailable) {
-            camera.openCamera(texture_view.context)
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            if (texture_view.isAvailable) {
+                if (::camera.isInitialized) {
+                    camera.openCamera()
+                } else {
+                    initCamera()
+                }
+                disableEnableActions(true)
+            } else {
+                texture_view.surfaceTextureListener = textureListener
+            }
+            permission_view.visibility = View.GONE
         } else {
-            texture_view.surfaceTextureListener = textureListener
+            permission_view.visibility = View.VISIBLE
+            disableEnableActions(false)
         }
     }
 
@@ -171,7 +181,6 @@ class MainActivity : FragmentActivity() {
         bookKeysViewModel.recognizeKey(image)
     }
 
-
     private fun initListeners() {
         texture_view.setOnClickListener {
             recognizePicture()
@@ -202,4 +211,20 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    private fun disableEnableActions(enable : Boolean){
+        zoom_seek_bar.isEnabled = enable
+        flash.isEnabled = enable
+        take_photo.isEnabled = enable
+    }
+
+    private fun initCamera(){
+        camera = Camera(texture_view).apply {
+            openCamera()
+        }
+        camera.autoFocusCallback = object : Camera.AutoFocusCallback {
+            override fun focusDetected() {
+                recognizePicture()
+            }
+        }
+    }
 }

@@ -25,6 +25,18 @@
                                           app:layout_constraintBottom_toBottomOf="@id/texture_view"
                                           android:id="@+id/rectView"/>
 
+    <include
+            android:id="@+id/permission_view"
+            android:layout_width="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/colorPrimary"
+            layout="@layout/permisson_view_container"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="0dp"/>
+
     <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/zoom_seek_bar"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -62,46 +74,5 @@
             android:focusable="true"
             android:background="?selectableItemBackground"
             android:src="@drawable/ic_flash"/>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/progress"
-            android:layout_width="100dp"
-            android:visibility="visible"
-            android:background="@android:color/white"
-            android:layout_height="100dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="@+id/rectView" app:layout_constraintEnd_toEndOf="@+id/rectView"
-            android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp">
-
-        <TextView android:layout_width="wrap_content"
-                  app:layout_constraintLeft_toLeftOf="parent"
-                  app:layout_constraintRight_toRightOf="parent"
-                  android:text="Data is syncing. Please wait"
-                  app:layout_constraintTop_toTopOf="parent"
-                  android:gravity="center"
-                  android:layout_height="wrap_content" android:id="@+id/textView"/>
-
-
-        <ProgressBar android:layout_width="24dp"
-                     android:layout_height="24dp"
-                     android:layout_marginBottom="8dp"
-                     app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                     android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-                     android:layout_marginStart="8dp" android:layout_marginTop="8dp"
-                     app:layout_constraintTop_toBottomOf="@+id/textView"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <FrameLayout
-                 android:id="@+id/fragment_container"
-                 android:layout_width="0dp"
-                 app:layout_constraintLeft_toLeftOf="parent"
-                 app:layout_constraintRight_toRightOf="parent"
-                 app:layout_constraintTop_toTopOf="parent"
-                 app:layout_constraintBottom_toBottomOf="parent"
-                 android:layout_height="0dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.guess.hk.smartbook
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -96,15 +97,10 @@ class Camera( private val textureView: TextureView) {
         backgroundHandler = Handler(backgroundThread.looper)
     }
 
-    fun openCamera(context: Context) {
+    @SuppressLint("MissingPermission")
+    fun openCamera() {
         openBackgroundThread()
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            cameraManager.openCamera(cameraId, stateCallback, backgroundHandler)
-        }
+        cameraManager.openCamera(cameraId, stateCallback, backgroundHandler)
     }
 
     fun closeCamera() {
