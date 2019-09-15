@@ -167,6 +167,11 @@ class MainActivity : FragmentActivity() {
         if (!isDataAvailable && menuFragment?.isVisible == true) {
             return
         }
+        val width = (rectView.points[2].x - rectView.points[1].x).toInt()
+        val heights = (rectView.points[3].y - rectView.points[2].y).toInt()
+        if (width <= 0 || heights <= 0) {
+            return
+        }
         camera.lock()
         val finalBitmap = Bitmap.createBitmap(
             texture_view.bitmap,
