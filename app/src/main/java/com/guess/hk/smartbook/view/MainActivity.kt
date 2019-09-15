@@ -140,14 +140,12 @@ class MainActivity : FragmentActivity() {
                 } else {
                     initCamera()
                 }
-                disableEnableActions(true)
             } else {
                 texture_view.surfaceTextureListener = textureListener
             }
             permission_view.visibility = View.GONE
         } else {
             permission_view.visibility = View.VISIBLE
-            disableEnableActions(false)
         }
     }
 
@@ -186,10 +184,6 @@ class MainActivity : FragmentActivity() {
             recognizePicture()
         }
 
-        take_photo.setOnClickListener {
-            recognizePicture()
-        }
-
         flash.setOnClickListener {
             camera.turnOnFlash()
         }
@@ -209,12 +203,6 @@ class MainActivity : FragmentActivity() {
         rectView.setZoomChangeListener {
             zoom_seek_bar.progress = (it * 10).toInt()
         }
-    }
-
-    private fun disableEnableActions(enable : Boolean){
-        zoom_seek_bar.isEnabled = enable
-        flash.isEnabled = enable
-        take_photo.isEnabled = enable
     }
 
     private fun initCamera(){
