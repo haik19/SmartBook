@@ -28,6 +28,11 @@ class MenuFragment : DialogFragment(){
         val itemWidth = getScreenWidthInPx(view.context) - convertDpToPixel(32f)
         val itemHeigth = convertDpToPixel(60f)
         bookKey?.let { it ->
+            if (it.links.size == 1) {
+                openLink(view.context, it.links.last().url)
+                return
+            }
+
             for (link in it.links){
                 val linkView =
                     LayoutInflater.from(view.context).inflate(R.layout.menu_item_layout, view as ViewGroup, false)

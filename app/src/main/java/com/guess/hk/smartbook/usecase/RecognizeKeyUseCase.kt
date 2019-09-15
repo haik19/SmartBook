@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.guess.hk.smartbook.levContains
 import com.guess.hk.smartbook.model.BookKey
 import com.guess.hk.smartbook.repo.KeysRepo
 import com.guess.hk.smartbook.repo.Resource
@@ -43,8 +44,8 @@ class RecognizeKeyUseCase(val repo: KeysRepo) {
     }
 
     private fun findBookById(key: String): BookKey? {
-        for (book in repo.getBookKeys()) { //TODO change with leneshteyin algorithm
-            if (key.contains(book.id)) {
+        for (book in repo.getBookKeys()) {
+            if (key.levContains(book.id)) {
                 return book
             }
         }
