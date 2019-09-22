@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -190,7 +191,14 @@ class MainActivity : FragmentActivity() {
         }
 
         flash.setOnClickListener {
+            if(!::camera.isInitialized){
+                return@setOnClickListener
+            }
+
             camera.turnOnFlash()
+            val flash = it as ImageView
+            flash.isSelected = !flash.isSelected
+            flash.setImageResource(if (flash.isSelected) R.drawable.ic_flash_on else R.drawable.ic_flash_off)
         }
 
         zoom_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

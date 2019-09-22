@@ -47,8 +47,8 @@ public class RectView extends View {
 		setFocusable(true);
 		float screenHeight = PicterActionsKt.getScreenHeightInPx(context);
 		float screenWidth = PicterActionsKt.getScreenWidthInPx(context);
-		float rectHeight = PicterActionsKt.convertDpToPixel(100);
-		float rectWidth = PicterActionsKt.convertDpToPixel(100);
+		float rectHeight = PicterActionsKt.convertDpToPixel(120);
+		float rectWidth = PicterActionsKt.convertDpToPixel(120);
 
 		points[0] = new PointF();
 		points[0].x = screenWidth / 2 - rectWidth / 2;
