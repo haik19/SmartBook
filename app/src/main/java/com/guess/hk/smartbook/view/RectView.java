@@ -1,6 +1,7 @@
 package com.guess.hk.smartbook.view;
 
 import java.util.ArrayList;
+import java.util.List;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
@@ -9,6 +10,7 @@ import android.view.View;
 import com.guess.hk.smartbook.model.Corner;
 import com.guess.hk.smartbook.PicterActionsKt;
 import com.guess.hk.smartbook.R;
+import com.guess.hk.smartbook.model.Line;
 
 public class RectView extends View {
 
@@ -27,6 +29,8 @@ public class RectView extends View {
 	protected double zoomLevel = 0f;
 	protected float maximumZoomLevel = 5;
 	private ZoomChangeListener zoomChangeListener;
+	private List<Line> lines = new ArrayList<>();
+	private int lineMargin;
 
 
 	public RectView(Context context) {
@@ -49,6 +53,7 @@ public class RectView extends View {
 		float screenWidth = PicterActionsKt.getScreenWidthInPx(context);
 		float rectHeight = PicterActionsKt.convertDpToPixel(120);
 		float rectWidth = PicterActionsKt.convertDpToPixel(120);
+		lineMargin = PicterActionsKt.convertDpToPixel(40);
 
 		points[0] = new PointF();
 		points[0].x = screenWidth / 2 - rectWidth / 2;
@@ -67,6 +72,11 @@ public class RectView extends View {
 		corners.add(new Corner(getContext(), R.drawable.top_letfh, points[1]));
 		corners.add(new Corner(getContext(), R.drawable.top_rigth, points[2]));
 		corners.add(new Corner(getContext(), R.drawable.bottom_rigth, points[3]));
+
+		lines.add(new Line(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2 - lineMargin, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2 -lineMargin)); // center line
+		lines.add(new Line(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2)); // center line
+		lines.add(new Line(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2 + lineMargin, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2 + lineMargin)); // center line
+
 		invalidate();
 	}
 
@@ -84,7 +94,9 @@ public class RectView extends View {
 		canvas.drawBitmap(corners.get(3).getBitmap(), corners.get(3).getX() - corners.get(3).getWidthOfBall(), corners.get(3).getY() - corners.get(3).getHeightOfBall(), roundsPaint);
 
 		//draw line
-		canvas.drawLine(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, linePaint);
+		for (Line line : lines){
+			canvas.drawLine(line.getStarX(), line.getStartY(), line.getStopX(), line.getStopY(), linePaint);
+		}
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
@@ -163,6 +175,17 @@ public class RectView extends View {
 					}
 					startX = event.getX();
 					startY = event.getY();
+
+					lines.clear();
+					lines.add(new Line(corners.get(0).getX() + 50, (corners.get(0).getY() + corners.get(1).getY()) / 2, corners.get(3).getX() - 50, (corners.get(0).getY() + corners.get(1).getY()) / 2)); // center line
+					for (int i = 0; i < (corners.get(0).getY() - corners.get(1).getY()) / lineMargin; i++) {
+						Line lastLine = lines.get(lines.size() - 1);
+						if (Math.abs(lastLine.getStopY() - corners.get(0).getY()) >= lineMargin) {
+							Line first = lines.get(0);
+							lines.add(0, new Line(first.getStarX(), first.getStartY() - lineMargin, first.getStopX(), first.getStopY() - lineMargin)); // center line
+							lines.add(lines.size(), new Line(lastLine.getStarX(), lastLine.getStartY() + lineMargin, lastLine.getStopX(), lastLine.getStopY() + lineMargin)); // center line
+						}
+					}
 					invalidate();
 					break;
 
